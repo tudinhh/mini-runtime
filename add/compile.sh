@@ -4,6 +4,7 @@ set -e
 MLIR_OPT="/home/anhtu/torch-mlir/build/bin/mlir-opt"
 TRANSLATE="/home/anhtu/torch-mlir/build/bin/mlir-translate"
 LLC="/home/anhtu/torch-mlir/build/bin/llc"
+BUILD="./build"
 
 echo "1. Lowering MLIR to LLVM Dialect..."
 $MLIR_OPT add_linalg.mlir \
