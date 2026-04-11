@@ -17,7 +17,7 @@ $TRANSLATE -mlir-to-llvmir $BUILD/convnet_llvm.mlir -o $BUILD/convnet.ll
 
 $LLC -O3 -filetype=obj -relocation-model=pic $BUILD/convnet.ll -o $BUILD/convnet.o
 
-$CLANG -O3 main.cpp $BUILD/convnet.o -o $BUILD/run-blas \
+$CLANG -O3 run.cpp $BUILD/convnet.o -o $BUILD/run-blas \
   -L$LIB_PATH \
   -lmlir_c_runner_utils \
   -lopenblas \

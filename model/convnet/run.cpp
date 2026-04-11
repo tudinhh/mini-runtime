@@ -13,7 +13,7 @@ template <typename T, int N> struct MemRefDescriptor {
 extern "C" {
   void _mlir_ciface_forward(MemRefDescriptor<float, 2> *output,
                             MemRefDescriptor<float, 4> *input);
-}
+} 
 
 int main() {
   const int batch_size = 1;
