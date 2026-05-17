@@ -13,3 +13,7 @@ This project demonstrates how to write a custom MLIR pass to intercept `linalg.m
 * `custom-opt/`: Contains the C++ source for the custom MLIR pass (`ConvertMatmulToBlas.cpp`).
 * `compile.sh`: The progressive lowering pipeline that translates `.mlir` to LLVM IR, compiles to an object file, and links the native libraries.
 * `main.cpp`: The C++ runner that initializes the `MemRefDescriptor`, calls the compiled MLIR function, and handles I/O.
+
+## Commands
+`export PATH=/path/to/torch-mlir/build/bin:$PATH`
+`export PYTHONPATH=/path/to/torch-mlir/build/tools/torch-mlir/python_packages/torch_mlir:$PYTHONPATH`
