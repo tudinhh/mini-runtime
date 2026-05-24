@@ -9,18 +9,18 @@ LIB_PATH="$TORCH_MLIR_DIR/build/lib"
 BUILD="./build"
 
 echo "1. Lowering MLIR to LLVM Dialect..."
-$CUSTOM_OPT build/convnet.mlir \
+$CUSTOM_OPT build/cnn.mlir \
   -pass-pipeline="builtin.module(linalg-to-bufferization,convert-matmul-to-blas,bufferization-to-llvm)" \
-  -o build/convnet_llvm.mlir
+  -o build/cnn_llvm.mlir
 
 echo "2. Translating to LLVM IR..."
-$TRANSLATE -mlir-to-llvmir build/convnet_llvm.mlir -o build/convnet.ll
+$TRANSLATE -mlir-to-llvmir build/cnn_llvm.mlir -o build/cnn.ll
 
 echo "3. Compile LLVM IR to .o"
-$LLC -O3 -filetype=obj -relocation-model=pic build/convnet.ll -o build/convnet.o
+$LLC -O3 -filetype=obj -relocation-model=pic build/cnn.ll -o build/cnn.o
 
 echo "4. Compiling run.cpp..."
-$CLANG -O3 run.cpp build/convnet.o -o build/run-blas \
+$CLANG -O3 run.cpp build/cnn.o -o build/run-blas \
   -L$LIB_PATH \
   -lmlir_c_runner_utils \
   -lopenblas \

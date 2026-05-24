@@ -17,8 +17,8 @@ module = export_and_import(
 )
 mlir_str = module.operation.get_asm()
 
-with open("build/convnet.mlir", "w") as f:
+with open("build/cnn.mlir", "w") as f:
     f.write(mlir_str)
 
-print("Compiled to convnet.mlir")
+print("Compiled to cnn.mlir")
 
