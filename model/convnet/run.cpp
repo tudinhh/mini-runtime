@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <iostream>
 #include <cstdint>
+#include <chrono>
 
 template <typename T, int N> struct MemRefDescriptor {
   T *allocated;
@@ -42,8 +43,27 @@ int main() {
       {batch_size, out_features}, {out_features, 1}
   };
 
-  _mlir_ciface_forward(&outputMemRef, &inputMemRef);
+  // ==================== BENCHMARK HARNESS ====================
+  const int warmup_runs = 10;
+  const int benchmark_runs = 100;
 
+  std::cout << "Warming up the model for " << warmup_runs << " runs...\n";
+  for (int i = 0; i < warmup_runs; ++i) {
+    _mlir_ciface_forward(&outputMemRef, &inputMemRef);
+  }
+
+  std::cout << "Profiling execution for " << benchmark_runs << " runs...\n";
+  auto start = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < benchmark_runs; ++i) {
+    _mlir_ciface_forward(&outputMemRef, &inputMemRef);
+  }
+  auto end = std::chrono::high_resolution_clock::now();
+
+  std::chrono::duration<double, std::milli> duration = end - start;
+  double average_time = duration.count() / benchmark_runs;
+  // ===========================================================
+
+  // Print results
   float *output = (float *)outputMemRef.aligned;
   for (int64_t i = 0; i < batch_size; ++i) {
     std::cout << "Batch " << i << ": ";
@@ -53,6 +73,11 @@ int main() {
     }
     std::cout << "\n";
   }
+
+  std::cout << "\n----------------------------------------\n";
+  std::cout << "Average Execution Time: " << std::fixed << std::setprecision(4) 
+            << average_time << " ms\n";
+  std::cout << "----------------------------------------\n";
 
   return 0;
 }

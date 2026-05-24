@@ -26,5 +26,10 @@ This file defines the conversion logic to replace `linalg.matmul` operations wit
 
 **Replace/Erase**: Deletes the original operation from the compiler graph.
 
+## Runtime
+This time, a profiling code is added into `run.cpp` to compare the run time between the code with and without OpenBLAS:
+- w/ OpenBLAS: 182 ms
+- w/o OpenBLAS: 156 ms
+
 ## Pop-up Questions
 No question.
