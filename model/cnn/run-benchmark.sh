@@ -7,6 +7,3 @@ taskset -c 0 ./build/run
 
 echo "Running OpenBLAS..."
 taskset -c 0 ./build/run-blas
-
-echo "Running OpenBLAS..."
-taskset -c 0 ./build/run-blas-fuse
