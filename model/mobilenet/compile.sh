@@ -4,7 +4,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 source "$SCRIPT_DIR/../../config.sh"
  
-LIB_PATH="$TORCH_MLIR_BUILD/lib"
+LIB_PATH="$TORCH_MLIR_DIR/build/lib"
 CUSTOM_OPT="../../custom-opt/build/bin/custom-opt"
 
 MODEL_NAME="mobilenet"
@@ -12,12 +12,12 @@ BUILD_DIR="build"
 
 echo "Compiling ${MODEL_NAME}..."
 
-echo "- Translate to LLVM MLIR"
+echo "- Apply MLIR transformations"
 $CUSTOM_OPT ${BUILD_DIR}/${MODEL_NAME}.mlir \
   -pass-pipeline="builtin.module(linalg-to-bufferization,bufferization-to-llvm)" \
   -o ${BUILD_DIR}/${MODEL_NAME}_llvm.mlir
 
-echo "- Translate to LLVM IR"
+echo "- Translate MLIR to LLVM IR"
 $TRANSLATE -mlir-to-llvmir ${BUILD_DIR}/${MODEL_NAME}_llvm.mlir -o ${BUILD_DIR}/${MODEL_NAME}.ll
 
 echo "- Compile LLVM IR to .o"

@@ -8,7 +8,7 @@ LIB_PATH="$TORCH_MLIR_BUILD/lib"
 
 sed -i 's/func.func @main\(.*\) {/func.func @forward\1 attributes {llvm.emit_c_interface} {/g' build/cnn.mlir
 
-echo "1. Apply MLIR transformations"
+echo "- Apply MLIR transformations"
 $MLIR_OPT build/cnn.mlir \
   -empty-tensor-to-alloc-tensor \
   -one-shot-bufferize="bufferize-function-boundaries=1" \
@@ -26,13 +26,13 @@ $MLIR_OPT build/cnn.mlir \
   -reconcile-unrealized-casts \
   -o build/cnn_llvm.mlir
 
-echo "2. Translate MLIR to LLVM IR"
+echo "- Translate MLIR to LLVM IR"
 $TRANSLATE -mlir-to-llvmir  build/cnn_llvm.mlir -o  build/cnn.ll
 
-echo "3. Compile LLVM IR to .o"
+echo "- Compile LLVM IR to .o"
 $LLC -O3 -filetype=obj -relocation-model=pic build/cnn.ll -o  build/cnn.o
 
-echo "4. Compile run.cpp"
+echo "- Compile run.cpp"
 $CLANG -O3 run.cpp  build/cnn.o -o  build/run \
   -L$TORCH_MLIR_DIR/build/lib \
   -lmlir_c_runner_utils \

@@ -4,7 +4,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 source "$SCRIPT_DIR/../../config.sh"
 
-echo "1. Apply MLIR transformations"
+echo "- Apply MLIR transformations"
 $MLIR_OPT build/add_linalg.mlir \
   -empty-tensor-to-alloc-tensor \
   -one-shot-bufferize="bufferize-function-boundaries=1" \
@@ -21,13 +21,13 @@ $MLIR_OPT build/add_linalg.mlir \
   -reconcile-unrealized-casts \
   -o build/add_llvm.mlir
 
-echo "2. Translate MLIR to LLVM IR"
+echo "- Translate MLIR to LLVM IR"
 $TRANSLATE -mlir-to-llvmir build/add_llvm.mlir > build/add.ll
 
-echo "3. Compile LLVM IR to .o"
+echo "- Compile LLVM IR to .o"
 $LLC -filetype=obj build/add.ll -o build/add.o
 
-echo "4. Compile run.cpp"
+echo "- Compile run.cpp"
 $CLANG -O3 run.cpp build/add.o -o build/run \
   -L$TORCH_MLIR_DIR/build/lib \
   -lmlir_c_runner_utils \
