@@ -3,7 +3,7 @@ A simple Pytorch model that adds two tensors.
 
 ## Compilation
 ### Capture the model and translate to MLIR
-The model is captured by Pytorch. Then, it is exported into `torch` dialect.
+The model is captured by Pytorch. Then, it is compiled into `torch` dialect.
 ```Python
 module_torch = torchscript.compile(
     model, 
@@ -11,16 +11,19 @@ module_torch = torchscript.compile(
     output_type="torch"
 )
 ```
-At this point, the output `add_torch.mlir` file still shows the high-level semantics of the model with ATen operations.
+At this point, the IR still shows the high-level semantics of the model with ATen operations.
+```
+    %0 = torch.aten.add.Tensor %arg0, %arg1, %int1 : ...
 
-The second option is translated into `linalg` dialect but on the tensor type. After this, the IR in `add_linalg.mlir` starts loosing the high-level architecture of the model.
+```
+The second option is translated into `linalg` dialect with option `linalg-on-tensors`. After this, the IR in add_linalg.mlir starts losing the high-level architecture of the model.
 
 ### Further lowering
-Once the IR reach `linalg` dialect, the compiler performs a series of transformations. Eventually, the MLIR is converted into LLVM IR in `add.ll`.
+Once the IR reach `linalg` dialect, the compiler performs a series of transformations. Each trasformation pass is added manually in compile.sh such as `-convert-linalg-to-loops`.
 
-Then, the file is compiled into an object file, which then is used to build an executable.
+Then, the file is compiled into an object file.
 
-To summarize, the model undergoes a series of transformations: PyTorch model → torch dialect → linalg dialect  → LLVM IR → executable. By the time it reaches the LLVM IR stage, it has lost all high-level architectural semantics, leaving only low-level instructions such as load, store, and add.
+To summarize, the model undergoes a series of transformations: PyTorch model → torch dialect → linalg dialect  → LLVM IR → executable. It loses high-level semantics after each pass.
 
 ### Runtime
 The run file does:
@@ -29,11 +32,16 @@ The run file does:
 - Call `_mlir_ciface_forward` to run the model.
 So, basically, this run time allocates the memory, packs them it an appropriate way, then calls the model.
 ## Pop-up questions
->This experiment uses `torch-mlir` to compile a model. What is the default compilation of Pytorch?
+**This experiment uses `torch-mlir` to compile a model. What is the default compilation of Pytorch?**
 
-Pytorch uses TorchInductor as the primary compiler backend. TorchInductor lowers the model graph then generates Triton kernels. Finally, it emits machine code.
+Pytorch uses TorchInductor as the primary compiler backend. TorchInductor lowers the model graph then generates Triton kernels.
 
->A simple runtime does: allocate -> organize -> execute. How about the production-grade runtimes like IREE and ONNX Runtime?
+**A simple runtime does: allocate -> organize -> execute. How about the production-grade runtimes like IREE and ONNX Runtime?**
 
+More advanced memory management, quantization, handling heterogeneous architecture, and more.
+
+**The idea of AI compiler**
+
+Many passes are applied on the original model graph to transform and optimize at several levels of abstraction.
 
 

@@ -18,7 +18,8 @@ struct MatmulOpToBlasLibraryCall : public ConversionPattern {
                                 ConversionPatternRewriter &rewriter) const override {
     auto matmulOp = cast<linalg::MatmulOp>(op);
     Location loc = matmulOp.getLoc();
-
+    
+    // Validation and type checking
     auto inputs = matmulOp.getDpsInputs();
     auto outputs = matmulOp.getDpsInits();
     if (inputs.size() != 2 || outputs.size() != 1) return failure();
@@ -55,7 +56,7 @@ struct MatmulOpToBlasLibraryCall : public ConversionPattern {
     Value order = rewriter.create<LLVM::ConstantOp>(loc, i32Type, rewriter.getI32IntegerAttr(101));
     Value transA = rewriter.create<LLVM::ConstantOp>(loc, i32Type, rewriter.getI32IntegerAttr(111));
     Value transB = rewriter.create<LLVM::ConstantOp>(loc, i32Type, rewriter.getI32IntegerAttr(111));
-
+    
     Value M, N, K, ldA, ldB, ldC;
 
     if (lhsShape[0] != ShapedType::kDynamic) {
@@ -95,15 +96,22 @@ struct MatmulOpToBlasLibraryCall : public ConversionPattern {
       ldC = rewriter.create<arith::IndexCastOp>(loc, i32Type, dimLdC);
     }
 
+    // Create alpha and beta for the BLAS equation
     Value alpha = rewriter.create<LLVM::ConstantOp>(loc, f32Type, rewriter.getF32FloatAttr(1.0));
     Value beta = rewriter.create<LLVM::ConstantOp>(loc, f32Type, rewriter.getF32FloatAttr(0.0));
 
+    // Extract raw pointers from MemRefs
     Value lhsPtr = rewriter.create<LLVM::ExtractValueOp>(loc, lhs, ArrayRef<int64_t>{1});
     Value rhsPtr = rewriter.create<LLVM::ExtractValueOp>(loc, rhs, ArrayRef<int64_t>{1});
     Value outputPtr = rewriter.create<LLVM::ExtractValueOp>(loc, output, ArrayRef<int64_t>{1});
 
+    // Group 14 arguments in an exact order required by cblas_gemm
     SmallVector<Value> args = {order, transA, transB, M, N, K, alpha, lhsPtr, ldA, rhsPtr, ldB, beta, outputPtr, ldC};
+    
+    // Add instruction to call cblas_gemm
     rewriter.create<LLVM::CallOp>(loc, sgemmFunc, args);
+
+    // Erase linalg.matmul from IR graph
     rewriter.eraseOp(matmulOp);
     return success();
   }
