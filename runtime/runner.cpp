@@ -30,7 +30,6 @@ int main(int argc, char** argv) {
     ModelFunc forward_pass = (ModelFunc)dlsym(handle, "_mlir_ciface_forward");
     if (!forward_pass) return 1;
 
-    // Allocate memory
     std::vector<float> data_x(4, 1.0f);
     std::vector<float> data_y(4, 2.0f);
     
@@ -38,18 +37,14 @@ int main(int argc, char** argv) {
     MemRef2D memref_y = {data_y.data(), data_y.data(), 0, {2, 2}, {2, 1}};
     MemRef2D memref_out;
 
-    // Initialize Command Buffer
     CommandBuffer cmd_buf;
 
-    // Record the execution command (Capture by reference is safe here as variables outlive the submit call)
     cmd_buf.record([&]() {
         forward_pass(&memref_out, &memref_x, &memref_y);
     });
 
-    // Submit and execute
     cmd_buf.submit();
 
-    // Verify
     float* out_data = memref_out.alignedPtr;
     for(int i = 0; i < 4; ++i) {
         std::cout << out_data[i] << " ";
