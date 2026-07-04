@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 # Build the generic runtime
 add_executable(tiny-runner runtime/runner.cpp)
 
-# Link against the OS dynamic loader library (dl)
-# Linux requires dl, macOS usually includes it in libc automatically
+target_include_directories(tiny-runner PRIVATE runtime/include)
 
 target_link_libraries(tiny-runner ${CMAKE_DL_LIBS})
