@@ -1,0 +1,25 @@
+include_directories(${LLVM_INCLUDE_DIRS})
+include_directories(${MLIR_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+# 1. Safely add all include directories to TableGen flags
+foreach(dir ${MLIR_INCLUDE_DIRS})
+  list(APPEND MLIR_TABLEGEN_FLAGS "-I${dir}")
+endforeach()
+list(APPEND MLIR_TABLEGEN_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+set(LLVM_TARGET_DEFINITIONS include/Dialect/Mnrt/MnrtOps.td)
+mlir_tablegen(MnrtOpsDialect.h.inc -gen-dialect-decls)
+mlir_tablegen(MnrtOpsDialect.cpp.inc -gen-dialect-defs)
+mlir_tablegen(MnrtOps.h.inc -gen-op-decls)
+mlir_tablegen(MnrtOps.cpp.inc -gen-op-defs)
+add_public_tablegen_target(MnrtOpsIncGen)
+
+set(LLVM_TARGET_DEFINITIONS include/Dialect/Mnrt/MnrtPasses.td)
+mlir_tablegen(MnrtPasses.h.inc -gen-pass-decls -name Mnrt)
+add_public_tablegen_target(MnrtPassesIncGen)
+
+add_subdirectory(src/Dialect/Mnrt)
+add_subdirectory(src/Conversion)
+add_subdirectory(tools)
