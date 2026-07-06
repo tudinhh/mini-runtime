@@ -12,4 +12,20 @@ target_link_libraries(mnrt-opt PRIVATE
   MLIRSCFDialect
   MLIRLLVMDialect
   MLIRLinalgDialect
+  MLIRAffineToStandard
+  MLIRSCFToControlFlow
+  MLIRMathToLLVM
+  MLIRArithToLLVM
+  MLIRMemRefToLLVM
+  MLIRFuncToLLVM
+  MLIRControlFlowToLLVM
+  MLIRReconcileUnrealizedCasts
+  MLIRLLVMIRTransforms
+  MLIRAffineTransforms
+  MLIRAffineDialect
+  MLIRMemRefTransforms
+  MLIRBufferizationTransforms
+  MLIRLinalgTransforms
+  MLIRTensorDialect
+  MLIRTensorTransforms
 )

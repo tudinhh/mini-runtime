@@ -14,7 +14,7 @@ module_linalg = torchscript.compile(
     (a, b), 
     output_type="linalg-on-tensors"
 )
-with open("./build/model_linalg.mlir", "w") as f:
+with open("./build/input.mlir", "w") as f:
     f.write(str(module_linalg))
 
 print("Done")

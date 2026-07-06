@@ -4,6 +4,7 @@
 
 namespace mnrt {
     std::unique_ptr<mlir::Pass> createConvertMemRefToMnrtPass();
+    std::unique_ptr<mlir::Pass> createConvertMnrtToLLVMPass();
 
     #define GEN_PASS_DECL
     #define GEN_PASS_REGISTRATION // Add this line

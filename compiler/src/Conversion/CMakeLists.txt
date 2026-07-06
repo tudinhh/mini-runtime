@@ -1,5 +1,5 @@
 add_mlir_library(MnrtConversionPasses
-  ConvertMemRefToMnrt.cpp
+  ConvertMemRefToMnrt.cpp ConvertMnrtToLLVM.cpp
 
   DEPENDS
   MnrtPassesIncGen

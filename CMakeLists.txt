@@ -16,8 +16,5 @@ include(TableGen)
 include(AddLLVM)
 include(AddMLIR)
 
-add_executable(mnrt-runner runtime/runner.cpp)
-target_include_directories(mnrt-runner PRIVATE runtime/include)
-target_link_libraries(mnrt-runner ${CMAKE_DL_LIBS})
-
 add_subdirectory(compiler)
+add_subdirectory(runtime)
